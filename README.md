@@ -247,11 +247,17 @@ https://www.npmjs.com/package/react
 https://www.npmjs.com/package/react-dom
 
 ### Wireframe
+
 https://www.figma.com/file/I8GbTurEQ8wQ6cdVHz4EU7/nigthzone?node-id=0%3A1
+
+### Trello
+
+https://trello.com/b/RQA4nfqp/nightzone
 
 ### Git
 
-[Repository Link](https://github.com/marileitune/nightzone)
+[Repository Link](https://github.com/marileitune/nightzone-server)
+[Repository Link](https://github.com/marileitune/nightzone-client)
 
 ### Slides
 
