@@ -85,7 +85,7 @@ Events:
   - POST /create
     - req.body = name, startDate, startTime, endDate, endTime, address, country, city, isPaid, price, capacity, description, image
 
-  - GET /event/:eventId
+  - GET /events/:eventId
 
   - PATCH /events/:eventId
 
@@ -97,7 +97,6 @@ Events:
 
 - user.routes.js
   - GET /account/:userId
-  - POST /account/:userId
   - PATCH /account/:userId
   - DELETE /account/:userId
 
@@ -128,7 +127,7 @@ ticketsBought: [{
   ref: 'event'
 }],
 superHost: {
-  type: Boolean,
+  type: Number,
   default: false
 }
 ```
@@ -184,7 +183,7 @@ Event model
  }
  imageAccount: {
     type: String,
-    default: '/images/default-image.jpeg'
+    required: true
  },
 ticketsSold:[{
   type: Schema.Types.ObjectId,
@@ -248,16 +247,16 @@ https://www.npmjs.com/package/react-dom
 
 ### Wireframe
 
-https://www.figma.com/file/I8GbTurEQ8wQ6cdVHz4EU7/nigthzone?node-id=0%3A1
+[Figma Link](]ttps://www.figma.com/file/I8GbTurEQ8wQ6cdVHz4EU7/nigthzone?node-id=0%3A1)
 
 ### Trello
 
-https://trello.com/b/RQA4nfqp/nightzone
+[Board Link](https://trello.com/b/RQA4nfqp/nightzone}
 
 ### Git
 
-[Repository Link](https://github.com/marileitune/nightzone-server)
-[Repository Link](https://github.com/marileitune/nightzone-client)
+[Server Repository Link](https://github.com/marileitune/nightzone-server)
+[Client Repository Link](https://github.com/marileitune/nightzone-client)
 
 ### Slides
 

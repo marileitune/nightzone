@@ -1,12 +1,31 @@
 const { Schema, model } = require("mongoose");
 
-// TODO: Please make sure you edit the user model to whatever makes sense in this case
 const userSchema = new Schema({
-  username: {
+  firstName: String,
+  lastName: String,
+  email: {
     type: String,
-    // unique: true -> Ideally, should be unique, but its up to you
+    unique: true
   },
   password: String,
+  googleID: String,
+  facebookId: String,
+  imageAccount: {
+    type: String,
+    default: 'https://res.cloudinary.com/dplgnsjzm/image/upload/v1626877273/nightpark-backend/images/default-avatar_bq7scv.png'
+  },
+  eventsCreated:[{
+    type: Schema.Types.ObjectId,
+    ef: 'event'
+  }],
+  ticketsBought: [{
+    type: Schema.Types.ObjectId,
+    ref: 'event'
+  }],
+  superHost: {
+    type: Number,
+    default: false
+  }
 });
 
 const User = model("User", userSchema);
