@@ -8,7 +8,7 @@ const userSchema = new Schema({
     unique: true
   },
   password: String,
-  googleID: String,
+  googleId: String,
   facebookId: String,
   imageAccount: {
     type: String,

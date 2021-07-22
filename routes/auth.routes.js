@@ -150,7 +150,7 @@ router.post('/signin', async (req, res) => {
 router.post('/logout', (req, res) => {
   req.session.destroy();
   // Nothing to send back to the user
-  res.status(204).json({});   
+  return res.status(204).json({});   
 })
 
 //middleware to check if the user is loggedIn

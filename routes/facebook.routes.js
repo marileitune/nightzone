@@ -5,8 +5,8 @@ const User = require('../models/User.model')
 router.post("/facebook/info", async (req, res, next) => {
   try {
     // the name itself will include the last name
-    const {name, email, image, facebookId} = req.body
-    //need to check if the user already exist in DB
+    const {name, email, imageAccount, facebookId} = req.body
+    //need to check if the user already exists in DB
     let user = await User.findOne({email})
     if (user) {
       req.session.loggedInUser = user
@@ -14,7 +14,8 @@ router.post("/facebook/info", async (req, res, next) => {
     }
 
     // Create the user in the DB
-    user = await User.create({firstName: name, facebookId, imageAccount: image, email})
+    console.log(imageAccount)
+    user = await User.create({firstName: name, facebookId, imageAccount, email})
     req.session.loggedInUser = user
     return res.status(200).json({data: user})
   }
