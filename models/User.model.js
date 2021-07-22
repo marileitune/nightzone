@@ -12,7 +12,7 @@ const userSchema = new Schema({
   facebookId: String,
   imageAccount: {
     type: String,
-    default: 'https://res.cloudinary.com/dplgnsjzm/image/upload/v1626877273/nightpark-backend/images/default-avatar_bq7scv.png'
+    default: 'https://res.cloudinary.com/dplgnsjzm/image/upload/v1626958315/nightzone-backend/images/default-avatar_sa2top.png'
   },
   eventsCreated:[{
     type: Schema.Types.ObjectId,

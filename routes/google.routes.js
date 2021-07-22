@@ -1,19 +1,20 @@
 const router = require("express").Router();
-const UserModel = require('../models/User.model')
+const User = require('../models/User.model')
 
 // The client makes a API request to this url sending the data in the body
-router.post("/google/info", (req, res, next) => {
-  const {firstName, lastName, email, image, googleId} = req.body
-  // the name itself will include the last name
+router.post("/google/info", async (req, res, next) => {
   try {
+    const {firstName, lastName, email, image, googleId} = req.body
+    //need to check if the user already exist in DB
+    let user = await User.findOne({email})
+    if (user) {
+      req.session.loggedInUser = user
+      return res.status(200).json({data: user})
+    }
     // Create the user in the DB
-    UserModel.create({firstName, lastName, googleId, imageAccount: image, email})
-      .then((response) => {
-        // Save the loggedInInfo in the session
-        // We'll stick to using sessions just to not over complicate the students with tokens and cookies
-        req.session.loggedInUser = response
-        res.status(200).json({data: response})
-      })
+    user = User.create({firstName, lastName, googleId, imageAccount: image, email})
+    req.session.loggedInUser = user
+    res.status(200).json({data: user})
   }
   catch(error) {
     res.status(500).json({error: `${error}`})
