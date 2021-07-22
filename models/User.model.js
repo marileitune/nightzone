@@ -16,11 +16,11 @@ const userSchema = new Schema({
   },
   eventsCreated:[{
     type: Schema.Types.ObjectId,
-    ef: 'event'
+    ref: 'Event'
   }],
   ticketsBought: [{
     type: Schema.Types.ObjectId,
-    ref: 'event'
+    ref: 'Event'
   }],
   superHost: {
     type: Number,

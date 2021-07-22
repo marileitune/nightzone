@@ -10,9 +10,7 @@ const User = require('../models/User.model')
 
 //START ROUTES  
 
-router.get('/auth', (req, res) => {
-  console.log(req.body)
-  const { email } = req.body //grab the email typed by the user
+router.get('/auth', async (req, res) => {
 
   // I don't think make sense do it here, because the verification is already being done in the signup or signin
   // if (!email) {
@@ -31,127 +29,122 @@ router.get('/auth', (req, res) => {
   // }
   
   //search the email in the DB
-  User.findOne({ email })
-    .then(user => {
-      if (!user) {
-        res.status(200).json(user);
-        //if the email doesn't exist in the DB, continue with signup
-        //continue with signup
-      } else { //if the email already exists in the DB, continue with signin
-        //continue with signin
-        res.status(200).json(null);
-      }
+  try {
+    const { email } = req.body //grab the email typed by the user
+    const user = await User.findOne({ email })
+    console.log(user)
+    if (user) {
+      return res.status(200).json(user);
+      //if the email already exists in the DB, continue with signin
+  
+      //continue with signup
+    } else { //if the email doesn't exist in the DB, continue with signup
+      //continue with signin
+      return res.status(200).json(null);
+    }
+  }
+  catch (err) {
+    return res.status(500).json({
+      error: 'Something went wrong',
+      message: err
     })
-    .catch((err) => {
-      res.status(500).json({
-        error: 'Something went wrong',
-        message: err
-    })
-  })
+  }
 })
 
-router.post('/signup', (req, res) => {
-  const { firstName, lastName, email, age, password, confirmPassword } = req.body
-  console.log(req.body)
-  if (!firstName || !lastName || !email || !age || !password || !confirmPassword) {
-    res.status(500).json({
-      errorMessage: 'Please fill in all fields'
-  });
-    return; 
-  }
-  //validation: check if email is in the right format
-  const reEmail = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-  if (!reEmail.test(email)) {
-    res.status(500).json({
-      errorMessage: 'Please enter a valid email address'
-    });
-    return;
-  }
-  //validation: check if the password contains a special character, a number, and be 6-16 characters
-  const rePassword = /^(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{6,16}$/;
-  if ( !rePassword.test(password) ) {
-    res.status(500).json({
-      errorMessage: 'Password needs to have a special character, a number, and be 6-16 characters'
-    });
-    return;
-  }
-
-  //validation: check if both passwords match
-  if ( password !== confirmPassword ) {
-    res.status(500).json({
-      errorMessage: "The two passwords don't match"
-    });
-    return;
-  }
+router.post('/signup', async (req, res) => {
+  try{
+    const { firstName, lastName, email, age, password, confirmPassword } = req.body
+    console.log(req.body)
+    if (!firstName || !lastName || !email || !age || !password || !confirmPassword) {
+      return res.status(500).json({
+        errorMessage: 'Please fill in all fields'
+      });
+    }
+    //validation: check if email is in the right format
+    const reEmail = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    if (!reEmail.test(email)) {
+      return res.status(500).json({
+        errorMessage: 'Please enter a valid email address'
+      });
+    }
+    //validation: check if the password contains a special character, a number, and be 6-16 characters
+    const rePassword = /^(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{6,16}$/;
+    if ( !rePassword.test(password) ) {
+      return res.status(500).json({
+        errorMessage: 'Password needs to have a special character, a number, and be 6-16 characters'
+      });
+    }
   
-  //encryption: create a salt and a hash
-  let salt = bcrypt.genSaltSync(10);
-  let hash = bcrypt.hashSync(password, salt);
-  User.create({firstName, lastName, email, password: hash})
-    .then(user => {
-      user.password = "***";
-      req.session.loggedInUser = user;
-      res.status(200).json(user);
-    })
-    .catch((err) => {
-      res.status(500).json({
+    //validation: check if both passwords match
+    if ( password !== confirmPassword ) {
+      return res.status(500).json({
+        errorMessage: "The two passwords don't match"
+      });
+    }
+    
+    //encryption: create a salt and a hash
+    let salt = bcrypt.genSaltSync(10);
+    let hash = bcrypt.hashSync(password, salt);
+    const user = await User.create({firstName, lastName, email, password: hash})
+    user.password = "***";
+    req.session.loggedInUser = user;
+     res.status(200).json(user); 
+  }
+  catch(err){
+      return res.status(500).json({
         errorMessage: 'Something went wrong. Please try again',
         message: err,
       });
-    })
+  }
 })
 
-router.post('/signin', (req, res) => {
-  const { email, password } = req.body
+router.post('/signin', async (req, res) => {
+  try {
+    const { email, password } = req.body
 
-  if (!email || !password) {
-    res.status(500).json({
-      errorMessage: 'Please fill in all fields'
-    });
-  }
+    if (!email || !password) {
+      return res.status(500).json({
+        errorMessage: 'Please fill in all fields'
+      });
+    }
 
-  //validation: check if email is in the right format
-  const reEmail = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-  if (!reEmail.test(email)) {
-    res.status(500).json({
-      errorMessage: 'Please enter a valid email address'
-    });
-    return;
-  }
+    //validation: check if email is in the right format
+    const reEmail = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    if (!reEmail.test(email)) {
+      return res.status(500).json({
+        errorMessage: 'Please enter a valid email address'
+      });
+    }
 
-  User.findOne({email})
-    .then(user => {
+    const user = await User.findOne({email})
+    if (user) {
       //check if the password that the user typed is the same that already exists in DB
-      bcrypt.compare(password, user.password)
-      .then (passwordMatch => {
-        //if both password match
-        if (passwordMatch) {
-          user.password = "***";
-          req.session.loggedInUser = user;
-          res.status(200).json(user)
-        }
-        //if both passwords don't match
-        else {
-          res.status(500).json({
-            error: "Your password is wrong"
-          })
-          return
-        }
+      const passwordMatch = await bcrypt.compare(password, user.password)
+      console.log(passwordMatch)
+      if (passwordMatch) {
+        user.password = "***";
+        req.session.loggedInUser = user;
+        return res.status(200).json(user)
+      }
+      //if both passwords don't match
+      else {
+        return res.status(500).json({
+          errorMessage: "Your password is wrong"
+        })
+      }
+    } 
+    else { //if the email doesn't exist in the DB, return an error
+      return res.status(500).json({
+        errorMessage: 'Email does not exist'
       })
-      .catch(() => {
-        res.status(500).json({
-          error: 'Something went wrong. Please try again',
-      })
-        return;    
-      })
+    }
+  }
+  catch(err){
+    return res.status(500).json({
+      error: 'Something went wrong. Please try again',
+      message: err
     })
-    .catch((err) => {
-      res.status(500).json({
-        error: 'Email does not exist',
-        message: err
-      })
-      return;  
-    })
+  }
 })
 
 router.post('/logout', (req, res) => {

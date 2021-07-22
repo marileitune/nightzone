@@ -17,7 +17,7 @@ const eventSchema = new Schema({
         type: String,
         required: true
     },
-    startTime: {
+    endTime: {
         type: String,
         required: true
     },
@@ -47,18 +47,25 @@ const eventSchema = new Schema({
         type: String,
         required: true
     },
-    imageAccount: {
+    imageEvent: {
          type: String,
          required: true
     },
     ticketsSold:[{
        type: Schema.Types.ObjectId,
-       ref: 'user'
+       ref: 'User'
     }],
-    host : {
+    checkIn:[{
+        type: Schema.Types.ObjectId,
+        ref: 'User'
+     }],
+    host: {
        type: Schema.Types.ObjectId,
-        ref: "user",
-    }
+        ref: "User",
+    },
+    comments: [{ 
+        type: Schema.Types.ObjectId, 
+        ref: "Comment" }],
 });
 
 const Event = model("Event", eventSchema);

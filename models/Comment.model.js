@@ -7,11 +7,11 @@ const commentSchema = new Schema({
     },
     authorId : {
         type: Schema.Types.ObjectId,
-        ref: "user",
+        ref: "User",
     },
     eventId : {
         type: Schema.Types.ObjectId,
-        ref: "event",
+        ref: "Event",
     }
 });
 
