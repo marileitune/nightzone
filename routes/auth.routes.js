@@ -101,7 +101,7 @@ router.post('/signup', async (req, res) => {
 router.post('/signin', async (req, res) => {
   try {
     const { email, password } = req.body
-
+    console.log(req.body)
     if (!email || !password) {
       return res.status(500).json({
         errorMessage: 'Please fill in all fields'
