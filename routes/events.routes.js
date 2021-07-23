@@ -47,7 +47,11 @@ router.get('/events/:eventId', async (req, res) => {
     try {
         const event = await Event.findById(req.params.eventId)
         .populate('host')
-        .populate('comments')
+
+        const comments = await Comment.find({eventId: req.params.eventId})
+        .populate('authorId')
+        event.comments = comments//these are the  event comments populated with user data
+
         return res.status(200).json(event)
     }
     catch(err){

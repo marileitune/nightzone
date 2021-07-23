@@ -57,28 +57,28 @@ router.post('/signup', async (req, res) => {
     const { firstName, lastName, email, password, confirmPassword } = req.body
     console.log(req.body)
     if (!firstName || !lastName || !email || !password || !confirmPassword) {
-      return res.status(500).json({
+      return res.status(200).json({
         errorMessage: 'Please fill in all fields'
       });
     }
     //validation: check if email is in the right format
     const reEmail = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
     if (!reEmail.test(email)) {
-      return res.status(500).json({
+      return res.status(200).json({
         errorMessage: 'Please enter a valid email address'
       });
     }
     //validation: check if the password contains a special character, a number, and be 6-16 characters
     const rePassword = /^(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{6,16}$/;
     if ( !rePassword.test(password) ) {
-      return res.status(500).json({
+      return res.status(200).json({
         errorMessage: 'Password needs to have a special character, a number, and be 6-16 characters'
       });
     }
   
     //validation: check if both passwords match
     if ( password !== confirmPassword ) {
-      return res.status(500).json({
+      return res.status(200).json({
         errorMessage: "The two passwords don't match"
       });
     }
@@ -104,7 +104,7 @@ router.post('/signin', async (req, res) => {
     const { email, password } = req.body
     console.log(req.body)
     if (!email || !password) {
-      return res.status(500).json({
+      return res.status(200).json({
         errorMessage: 'Please fill in all fields'
       });
     }
@@ -112,7 +112,7 @@ router.post('/signin', async (req, res) => {
     //validation: check if email is in the right format
     const reEmail = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
     if (!reEmail.test(email)) {
-      return res.status(500).json({
+      return res.status(200).json({
         errorMessage: 'Please enter a valid email address'
       });
     }
@@ -129,7 +129,7 @@ router.post('/signin', async (req, res) => {
       }
       //if both passwords don't match
       else {
-        return res.status(500).json({
+        return res.status(200).json({
           errorMessage: "Your password is wrong"
         })
       }
