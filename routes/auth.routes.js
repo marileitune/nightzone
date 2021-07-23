@@ -10,7 +10,7 @@ const User = require('../models/User.model')
 
 //START ROUTES  
 
-router.get('/auth', async (req, res) => {
+router.post('/auth', async (req, res) => {
 
   // I don't think make sense do it here, because the verification is already being done in the signup or signin
   // if (!email) {
@@ -31,6 +31,7 @@ router.get('/auth', async (req, res) => {
   //search the email in the DB
   try {
     const { email } = req.body //grab the email typed by the user
+    console.log(req.body)
     const user = await User.findOne({ email })
     console.log(user)
     if (user) {
@@ -53,9 +54,9 @@ router.get('/auth', async (req, res) => {
 
 router.post('/signup', async (req, res) => {
   try{
-    const { firstName, lastName, email, age, password, confirmPassword } = req.body
+    const { firstName, lastName, email, password, confirmPassword } = req.body
     console.log(req.body)
-    if (!firstName || !lastName || !email || !age || !password || !confirmPassword) {
+    if (!firstName || !lastName || !email || !password || !confirmPassword) {
       return res.status(500).json({
         errorMessage: 'Please fill in all fields'
       });
