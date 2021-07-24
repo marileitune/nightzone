@@ -125,6 +125,7 @@ router.post('/signin', async (req, res) => {
       if (passwordMatch) {
         user.password = "***";
         req.session.loggedInUser = user;
+        console.log('auth', req.session.loggedInUser , 'user', user )
         return res.status(200).json(user)
       }
       //if both passwords don't match

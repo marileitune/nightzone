@@ -30,6 +30,7 @@ router.post('/create', async (req, res) => {
 //handle events list
 router.get('/events', async (req, res) => {
     try { 
+        console.log('events userId:', req.session.loggedInUser)
         const events = await Event.find()
         .populate('checkIn')
         return res.status(200).json(events)
@@ -63,13 +64,17 @@ router.get('/events/:eventId', async (req, res) => {
 })
 
 //handle buy ticket 
-router.post('/events/:eventId/buy', async (req, res) => {
+router.get('/events/:eventId/buy', async (req, res) => {
     try {
-    //if the payment is successful, we need to update the DB (user: ticketsBought ; event: ticketsSold)
-    const event = await Event.findByIdAndUpdate({_id: req.params.eventId}, { $push: { ticketsSold: req.session.loggedInUser._id } })
-    const user = await User.findByIdAndUpdate({_id: req.session.loggedInUser._id}, { $push: { ticketsBought: req.params.eventId } })
-    
-    return res.status(200).json(user)
+        console.log('detail userId:', req.session.loggedInUser)
+        console.log('trying')
+        console.log('eventId:', req.params.eventId)
+        //if the payment is successful, we need to update the DB (user: ticketsBought ; event: ticketsSold)
+        const event = await Event.findByIdAndUpdate({_id: req.params.eventId}, { $push: { ticketsSold: req.session.loggedInUser._id } })
+        console.log('event', event)
+        const user = await User.findByIdAndUpdate({_id: req.session.loggedInUser._id}, { $push: { ticketsBought: req.params.eventId } })
+        console.log('user', user)
+        return res.status(200).json(event)
     }
     catch (err) {
         res.status(500).json({
