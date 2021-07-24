@@ -62,6 +62,23 @@ router.get('/events/:eventId', async (req, res) => {
     }
 })
 
+//handle buy ticket 
+router.post('/events/:eventId/buy', async (req, res) => {
+    try {
+    //if the payment is successful, we need to update the DB (user: ticketsBought ; event: ticketsSold)
+    const event = await Event.findByIdAndUpdate({_id: req.params.eventId}, { $push: { ticketsSold: req.session.loggedInUser._id } })
+    const user = await User.findByIdAndUpdate({_id: req.session.loggedInUser._id}, { $push: { ticketsBought: req.params.eventId } })
+    
+    return res.status(200).json(user)
+    }
+    catch (err) {
+        res.status(500).json({
+            error: 'Something went wrong',
+            message: err
+        })
+    }
+})
+
 //handle edit event 
 router.patch('/events/:eventId', async (req, res) => {
     try {
@@ -110,6 +127,7 @@ router.post('/events/:eventId/comment', async (req, res) => {
     }
 })
 
+//handle check in
 router.post('/events/:eventId/checkin', async (req, res) => {
     try {
         const event = req.params.eventId
