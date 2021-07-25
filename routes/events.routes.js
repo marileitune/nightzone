@@ -46,14 +46,28 @@ router.get('/events', async (req, res) => {
 //handle event detail
 router.get('/events/:eventId', async (req, res) => {
     try {
-        const event = await Event.findById(req.params.eventId)
+        let event = await Event.findById(req.params.eventId)
         .populate('host')
+        user = req.session.loggedInUser._id
+        console.log(user, event.ticketsSold)
 
         const comments = await Comment.find({eventId: req.params.eventId})
         .populate('authorId')
         event.comments = comments//these are the  event comments populated with user data
-
+        console.log('event.host._id = ', event.host._id, 'user = ', user)
+        if (event.ticketsSold.includes(user) || event.host._id == user) {
+            event = {
+                event: event,
+                canBuy: false, 
+            }
+        } else {
+            event = {
+                event: event,
+                canBuy: true
+            }
+        }
         return res.status(200).json(event)
+
     }
     catch(err){
         res.status(500).json({
@@ -64,6 +78,7 @@ router.get('/events/:eventId', async (req, res) => {
 })
 
 //handle buy ticket 
+//why does post method reset the req.session.loggedInUser? Because of it I needed to to a get here.
 router.get('/events/:eventId/buy', async (req, res) => {
     try {
         console.log('detail userId:', req.session.loggedInUser)
@@ -71,9 +86,7 @@ router.get('/events/:eventId/buy', async (req, res) => {
         console.log('eventId:', req.params.eventId)
         //if the payment is successful, we need to update the DB (user: ticketsBought ; event: ticketsSold)
         const event = await Event.findByIdAndUpdate({_id: req.params.eventId}, { $push: { ticketsSold: req.session.loggedInUser._id } })
-        console.log('event', event)
         const user = await User.findByIdAndUpdate({_id: req.session.loggedInUser._id}, { $push: { ticketsBought: req.params.eventId } })
-        console.log('user', user)
         return res.status(200).json(event)
     }
     catch (err) {
