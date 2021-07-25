@@ -14,9 +14,9 @@ const Comment = require('../models/Comment.model')
 //handle create event
 router.post('/create', async (req, res) => {
     try {
-        const {name, startDate, startTime, endDate, endTime, address, country, city, isPaid, ticketsPrice, capacity, description, categories, imageEvent} = req.body
+        const {name, start, end, address, country, city, isPaid, ticketsPrice, capacity, description, categories, imageEvent} = req.body
         const user = req.session.loggedInUser._id
-        const event = await Event.create({name, startDate, startTime, endDate, endTime, address, country, city, isPaid, ticketsPrice, capacity, description, categories, imageEvent, host: user})
+        const event = await Event.create({name, start, end, address, country, city, isPaid, ticketsPrice, capacity, description, categories, imageEvent, host: user})
         return res.status(200).json(event)
     }
     catch(err) {
@@ -101,8 +101,8 @@ router.get('/events/:eventId/buy', async (req, res) => {
 router.patch('/events/:eventId', async (req, res) => {
     try {
         let eventId = req.params.eventId
-        const {name, startDate, startTime, endDate, endTime, address, country, city, isPaid, ticketsPrice, capacity, description, imageEvent} = req.body
-        let response = await Event.findByIdAndUpdate({_id: eventId}, {name, startDate, startTime, endDate, endTime, address, country, city, isPaid, ticketsPrice, capacity, description, imageEvent}, {new: true})
+        const {name, start, end, address, country, city, isPaid, ticketsPrice, capacity, description, imageEvent} = req.body
+        let response = await Event.findByIdAndUpdate({_id: eventId}, {name, start, end, address, country, city, isPaid, ticketsPrice, capacity, description, imageEvent}, {new: true})
         return res.status(200).json(response)
     }
     catch(err){

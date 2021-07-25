@@ -5,19 +5,11 @@ const eventSchema = new Schema({
         type: String,
         required: true
     },
-    startDate: {
+    start: {
         type: String,
         required: true
     },
-    startTime: {
-        type: String,
-        required: true
-    },
-    endDate: {
-        type: String,
-        required: true
-    },
-    endTime: {
+    end: {
         type: String,
         required: true
     },
