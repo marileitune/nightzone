@@ -14,6 +14,7 @@ const Comment = require('../models/Comment.model')
 //handle create event
 router.post('/create', async (req, res) => {
     try {
+        console.log(req.body)
         const {name, start, end, address, country, city, isPaid, ticketsPrice, capacity, description, categories, imageEvent} = req.body
         const user = req.session.loggedInUser._id
         const event = await Event.create({name, start, end, address, country, city, isPaid, ticketsPrice, capacity, description, categories, imageEvent, host: user})
