@@ -97,11 +97,8 @@ router.patch('/account/:userId', async (req, res) => {
           let salt = bcrypt.genSaltSync(10);
           let hash = bcrypt.hashSync(password, salt);
           const user = await User.findByIdAndUpdate({_id: userId}, {firstName, lastName, email, imageAccount, password: hash}, {new: true})
-          console.log('here2')
           user.password = "***";
-          console.log('áqui3')
           req.session.loggedInUser = user;
-          console.log('áqui4')
           return res.status(200).json(user); 
     }
     catch(err) {

@@ -31,9 +31,7 @@ router.post('/auth', async (req, res) => {
   //search the email in the DB
   try {
     const { email } = req.body //grab the email typed by the user
-    console.log(req.body)
     const user = await User.findOne({ email })
-    console.log(user)
     if (user) {
       return res.status(200).json(user);
       //if the email already exists in the DB, continue with signin
@@ -55,7 +53,6 @@ router.post('/auth', async (req, res) => {
 router.post('/signup', async (req, res) => {
   try{
     const { firstName, lastName, email, password, confirmPassword } = req.body
-    console.log(req.body)
     if (!firstName || !lastName || !email || !password || !confirmPassword) {
       return res.status(200).json({
         errorMessage: 'Please fill in all fields'
@@ -102,7 +99,6 @@ router.post('/signup', async (req, res) => {
 router.post('/signin', async (req, res) => {
   try {
     const { email, password } = req.body
-    console.log(req.body)
     if (!email || !password) {
       return res.status(200).json({
         errorMessage: 'Please fill in all fields'
@@ -121,11 +117,9 @@ router.post('/signin', async (req, res) => {
     if (user) {
       //check if the password that the user typed is the same that already exists in DB
       const passwordMatch = await bcrypt.compare(password, user.password)
-      console.log(passwordMatch)
       if (passwordMatch) {
         user.password = "***";
         req.session.loggedInUser = user;
-        console.log('auth', req.session.loggedInUser , 'user', user )
         return res.status(200).json(user)
       }
       //if both passwords don't match

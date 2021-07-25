@@ -14,7 +14,6 @@ router.post("/facebook/info", async (req, res, next) => {
     }
 
     // Create the user in the DB
-    console.log(imageAccount)
     user = await User.create({firstName: name, facebookId, imageAccount, email})
     req.session.loggedInUser = user
     return res.status(200).json({data: user})

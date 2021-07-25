@@ -14,7 +14,6 @@ const Comment = require('../models/Comment.model')
 //handle create event
 router.post('/create', async (req, res) => {
     try {
-        console.log(req.body)
         const {name, start, end, address, country, city, isPaid, ticketsPrice, capacity, description, categories, imageEvent} = req.body
         const user = req.session.loggedInUser._id
         const event = await Event.create({name, start, end, address, country, city, isPaid, ticketsPrice, capacity, description, categories, imageEvent, host: user})
@@ -31,7 +30,6 @@ router.post('/create', async (req, res) => {
 //handle events list
 router.get('/events', async (req, res) => {
     try { 
-        console.log('events userId:', req.session.loggedInUser)
         const events = await Event.find()
         .populate('checkIn')
         return res.status(200).json(events)
@@ -44,18 +42,53 @@ router.get('/events', async (req, res) => {
     }
 })
 
+// handle hotzone
+router.get('/events/hotzone', async (req, res) => {
+    try {
+        console.log('ariana')
+        let events = await Event.find()
+        .populate('checkIn')
+        
+        let eventsFiltered = events.filter((event) => {
+            let today = new Date().getTime(); 
+            let eventStartDate = Date.parse(event.start); 
+            let eventEndDate = Date.parse(event.end);//comparing all the dates in milliseconds 
+            return (today > eventStartDate && today < eventEndDate) 
+        })        
+        
+            let percent = eventsFiltered.map((eventFiltered) => {
+            let capacity = eventFiltered.capacity 
+            let checkedIn = eventFiltered.checkIn.length //is the percent that we want to get
+            let percent = (checkedIn * 100) / capacity
+            return percent
+        }) 
+
+        let eventsHotzone = {
+            eventsFiltered: eventsFiltered,
+            progress: percent
+        }
+
+
+        console.log(eventsFiltered)
+        return res.status(200).json(eventsHotzone)
+    }
+    catch(err) {
+        console.log(err)
+       
+    }
+})
+
+
 //handle event detail
 router.get('/events/:eventId', async (req, res) => {
     try {
         let event = await Event.findById(req.params.eventId)
         .populate('host')
         user = req.session.loggedInUser._id
-        console.log(user, event.ticketsSold)
 
         const comments = await Comment.find({eventId: req.params.eventId})
         .populate('authorId')
         event.comments = comments//these are the  event comments populated with user data
-        console.log('event.host._id = ', event.host._id, 'user = ', user)
         if (event.ticketsSold.includes(user) || event.host._id == user) {
             event = {
                 event: event,
@@ -143,22 +176,6 @@ router.post('/events/:eventId/comment', async (req, res) => {
     }
 })
 
-//handle check in
-router.post('/events/:eventId/checkin', async (req, res) => {
-    try {
-        const event = req.params.eventId
-        const user = req.session.loggedInUser._id
-        await Event.findByIdAndUpdate({_id: event}, { $push: { checkIn: user}})
-        return res.status(200).json()
-    }
-    catch(err) {
-        return res.status(500).json({
-            error: 'Something went wrong',
-            message: err
-        })
-    }
-})
-
 //handle checkIn
 router.get('/events/:eventId/checkIn', async (req, res) => {
     try {
@@ -172,5 +189,11 @@ router.get('/events/:eventId/checkIn', async (req, res) => {
        })
     }
    })
+
+//handle hot zone
+
+
+
+
 
 module.exports = router;

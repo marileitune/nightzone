@@ -10,10 +10,7 @@ const Event = require('../models/Event.model')
 // };
 
 router.post("/create-payment-intent", async (req, res) => {
-
-
   try {
-    console.log('stripe userId:', req.session.loggedInUser)
     const { eventId } = req.body;
     const response = await Event.findById({_id: eventId})//we are looking for the event to grab the ticketsPrice from the DB, so the user can't modify in the front to pay less.
     const ticketPrice = response.ticketsPrice*100// we need to multiply because for stripe 12 = 0012, so it would be 0,12 cents.
@@ -23,7 +20,6 @@ router.post("/create-payment-intent", async (req, res) => {
       currency: "eur"
       });
   
-    console.log(paymentIntent.client_secret)
     res.send({
       clientSecret: paymentIntent.client_secret
     });
