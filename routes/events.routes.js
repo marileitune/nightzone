@@ -17,6 +17,7 @@ router.post('/create', async (req, res) => {
         const {name, start, end, address, country, city, isPaid, ticketsPrice, capacity, description, categories, imageEvent} = req.body
         const user = req.session.loggedInUser._id
         const event = await Event.create({name, start, end, address, country, city, isPaid, ticketsPrice, capacity, description, categories, imageEvent, host: user})
+        await User.findByIdAndUpdate({_id: user}, { $push: { eventsCreated: event } })
         return res.status(200).json(event)
     }
     catch(err) {
@@ -45,9 +46,8 @@ router.get('/events', async (req, res) => {
 // handle hotzone
 router.get('/events/hotzone', async (req, res) => {
     try {
-        console.log('ariana')
         let events = await Event.find()
-        .populate('checkIn')
+        .populate('checkIn')//this is to get the user's photo and name
         
         let eventsFiltered = events.filter((event) => {
             let today = new Date().getTime(); 
@@ -58,18 +58,15 @@ router.get('/events/hotzone', async (req, res) => {
         
             let percent = eventsFiltered.map((eventFiltered) => {
             let capacity = eventFiltered.capacity 
-            let checkedIn = eventFiltered.checkIn.length //is the percent that we want to get
-            let percent = (checkedIn * 100) / capacity
+            let checkedIn = eventFiltered.checkIn.length 
+            let percent = (checkedIn * 100) / capacity //is the percent of the capacity that already was filled.
             return percent
         }) 
 
         let eventsHotzone = {
             eventsFiltered: eventsFiltered,
-            progress: percent
+            progress: percent // we pass it for the front end to use in the progress bar
         }
-
-
-        console.log(eventsFiltered)
         return res.status(200).json(eventsHotzone)
     }
     catch(err) {
@@ -100,6 +97,7 @@ router.get('/events/:eventId', async (req, res) => {
                 canBuy: true
             }
         }
+        console.log(event)
         return res.status(200).json(event)
 
     }
