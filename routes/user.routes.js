@@ -53,6 +53,7 @@ router.patch('/account/:userId', async (req, res) => {
     try {
         let userId = req.params.userId
         const {firstName, lastName, email, imageAccount, password, confirmPassword} = req.body
+        console.log('req.email', email)
         if (!firstName || !lastName || !email || !password || !confirmPassword) {
             return res.status(500).json({
                 errorMessage: 'Please fill in all fields'
@@ -75,33 +76,38 @@ router.patch('/account/:userId', async (req, res) => {
             }
         }
 
-        //validation: check if the password contains a special character, a number, and be 6-16 characters
-        const rePassword = /^(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{6,16}$/;
-        if ( !rePassword.test(password) ) {
-            return res.status(500).json({
-                errorMessage: 'Password needs to have a special character, a number, and be 6-16 characters'
-            });
+        if (password !== req.session.loggedInUser.password) {
+                    //validation: check if the password contains a special character, a number, and be 6-16 characters
+            const rePassword = /^(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{6,16}$/;
+            if ( !rePassword.test(password) ) {
+                return res.status(500).json({
+                    errorMessage: 'Password needs to have a special character, a number, and be 6-16 characters'
+                });
+            }
+            //validation: check if both passwords match
+            if ( password !== confirmPassword ) {
+                return res.status(500).json({
+                    errorMessage: "The two passwords don't match"
+                });
+            }
+
         }
-        //validation: check if both passwords match
-        if ( password !== confirmPassword ) {
-            return res.status(500).json({
-                errorMessage: "The two passwords don't match"
-            });
-        }
-          
+
+        //encryption: create a salt and a hash
+        let salt = bcrypt.genSaltSync(10);
+        let hash = bcrypt.hashSync(password, salt);
+
         if (!imageAccount) {
             imageAccount = req.session.loggedInUser.imageAccount
         }
-          //encryption: create a salt and a hash
-        
-          let salt = bcrypt.genSaltSync(10);
-          let hash = bcrypt.hashSync(password, salt);
-          const user = await User.findByIdAndUpdate({_id: userId}, {firstName, lastName, email, imageAccount, password: hash}, {new: true})
-          user.password = "***";
+       
+        const user = await User.findByIdAndUpdate({_id: userId}, {firstName, lastName, email, imageAccount, password: password}, {new: true})
+        user.password = "***";
           req.session.loggedInUser = user;
           return res.status(200).json(user); 
     }
     catch(err) {
+       console.log(err)
        return res.status(500).json({
            error: 'Something went wrong',
            message: err
