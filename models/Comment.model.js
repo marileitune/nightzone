@@ -12,7 +12,10 @@ const commentSchema = new Schema({
     eventId : {
         type: Schema.Types.ObjectId,
         ref: "Event",
-    }
+    },
+    date: {
+        type: String
+    },
 });
 
 const Comment = model("Comment", commentSchema);

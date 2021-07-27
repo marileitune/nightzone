@@ -161,10 +161,23 @@ router.post('/events/:eventId/comment', async (req, res) => {
     try {
         const event = req.params.eventId
         const user = req.session.loggedInUser._id
-        const {comment} = req.body
-        const myComment = await Comment.create({comment, authorId: user, eventId: event})
+        const {comment, date} = req.body
+        const dateNow = new Date
+        let day = dateNow.getDate();
+        let month = dateNow.getMonth() + 1;
+        let year = dateNow.getFullYear();
+        if (day < 10) {
+            day = '0' + day;
+        }
+        if (month < 10) {
+            month = '0' + month;
+        }
+        let dateFormated = day + '/' + month + '/' + year;
+        const myComment = await Comment.create({comment, authorId: user, eventId: event, date: dateFormated})
+        const myCommentPopulated = await Comment.findById({_id: myComment._id})
+        .populate('authorId')
         await Event.findByIdAndUpdate({_id: event}, { $push: { comments: myComment._id}})
-        return res.status(200).json()
+        return res.status(200).json({myCommentPopulated})
     }
     catch(err) {
         return res.status(500).json({
