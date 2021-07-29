@@ -34,13 +34,14 @@ router.get('/events', async (req, res) => {
         const events = await Event.find()
         .populate('checkIn')
 
+        console.log(events.length)
         let eventsFiltered = events.filter((event) => {
             let today = new Date().getTime(); 
             let eventStartDate = Date.parse(event.start); 
             let eventEndDate = Date.parse(event.end);//comparing all the dates in milliseconds 
-            return (today > eventStartDate && today < eventEndDate) 
+            return (today <= eventEndDate) 
         }) 
-        
+        console.log(eventsFiltered.length)
         let eventsSorted = eventsFiltered.sort((a, b) => {
             if (a.start > b.start) {
                 return 1
@@ -50,7 +51,7 @@ router.get('/events', async (req, res) => {
                 return 0
             }
         })
-
+        console.log(eventsSorted.length)
         return res.status(200).json(eventsSorted)
     }
     catch(err) {
@@ -71,7 +72,7 @@ router.get('/events/hotzone', async (req, res) => {
             let today = new Date().getTime(); 
             let eventStartDate = Date.parse(event.start); 
             let eventEndDate = Date.parse(event.end);//comparing all the dates in milliseconds 
-            return (today > eventStartDate && today < eventEndDate) 
+            return (today >= eventStartDate && today <= eventEndDate) 
         }) 
         
         let eventsSorted = eventsFiltered.sort((a, b) => {
