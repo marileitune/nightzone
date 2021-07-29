@@ -1,6 +1,8 @@
 const router = require("express").Router();
+const { findById } = require("../models/Conversation.model");
 const Conversation = require('../models/Conversation.model')
 const Message = require('../models/Message.model')
+const User = require('../models/User.model')
 
 // A route to return the converstaion id between two participants if it already exists
 // or create a new converstaion, when users chat for the first time
@@ -46,6 +48,32 @@ router.get('/messages/:conversationId', async(req, res, next) => {
             message: err
         })
      }
+})
+
+// A route to get all messages of all converstaions
+router.get('/messages', async(req, res, next) => {
+  try {
+      
+      let conversations = await Message.find({})
+      .populate('participants')
+
+      let sender = []
+      conversations.forEach((elem) => {
+        //elem.sender is an objectId
+          (elem.sender.toString() != req.session.loggedInUser._id) && !sender.includes(elem.sender.toString()) ? sender.push(elem.sender.toString()) : ''
+      })
+
+      let users = await User.find({_id: sender})
+
+      res.status(200).json(users)
+  }
+  catch(err) {
+      console.log(err)
+      return res.status(500).json({
+          error: 'Something went wrong',
+          message: err
+      })
+   }
 })
 
 module.exports = router;
