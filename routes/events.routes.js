@@ -33,7 +33,25 @@ router.get('/events', async (req, res) => {
     try { 
         const events = await Event.find()
         .populate('checkIn')
-        return res.status(200).json(events)
+
+        let eventsFiltered = events.filter((event) => {
+            let today = new Date().getTime(); 
+            let eventStartDate = Date.parse(event.start); 
+            let eventEndDate = Date.parse(event.end);//comparing all the dates in milliseconds 
+            return (today > eventStartDate && today < eventEndDate) 
+        }) 
+        
+        let eventsSorted = eventsFiltered.sort((a, b) => {
+            if (a.start > b.start) {
+                return 1
+            } else if (a.start < b.start){
+                return -1
+            } else {
+                return 0
+            }
+        })
+
+        return res.status(200).json(eventsSorted)
     }
     catch(err) {
         return   res.status(500).json({
@@ -54,17 +72,27 @@ router.get('/events/hotzone', async (req, res) => {
             let eventStartDate = Date.parse(event.start); 
             let eventEndDate = Date.parse(event.end);//comparing all the dates in milliseconds 
             return (today > eventStartDate && today < eventEndDate) 
-        })        
+        }) 
         
-            let percent = eventsFiltered.map((eventFiltered) => {
-            let capacity = eventFiltered.capacity 
-            let checkedIn = eventFiltered.checkIn.length 
+        let eventsSorted = eventsFiltered.sort((a, b) => {
+            if (a.start > b.start) {
+                return -1
+            } else if (a.start < b.start){
+                return 1
+            } else {
+                return 0
+            }
+        })
+        
+        let percent = eventsSorted.map((event) => {
+            let capacity = event.capacity 
+            let checkedIn = event.checkIn.length 
             let percent = (checkedIn * 100) / capacity //is the percent of the capacity that already was filled.
             return percent
         }) 
 
         let eventsHotzone = {
-            eventsFiltered: eventsFiltered,
+            eventsFiltered: eventsSorted,
             progress: percent // we pass it for the front end to use in the progress bar
         }
         return res.status(200).json(eventsHotzone)
