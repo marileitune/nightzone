@@ -72,7 +72,7 @@ router.get('/events/hotzone', async (req, res) => {
             let today = new Date().getTime() ; 
             let eventStartDate = Date.parse(event.start); 
             let eventEndDate = Date.parse(event.end);//comparing all the dates in milliseconds 
-            return (today >= eventStartDate - 10800000 && today <= eventEndDate) 
+            return (today >= eventStartDate - 36000000 && today <= eventEndDate) 
         }) 
         
         let eventsSorted = eventsFiltered.sort((a, b) => {

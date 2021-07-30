@@ -20,7 +20,7 @@ router.get('/account/:userId', async (req, res) => {
         let eventStartDate = Date.parse(event.start); 
         let eventEndDate = Date.parse(event.end);//comparing all the dates in milliseconds 
 
-        if (!event.checkIn.includes(user._id) && today > eventStartDate && today < eventEndDate) {
+        if (!event.checkIn.includes(user._id) && today > eventStartDate - 36000000 && today < eventEndDate) {
            return  event = {
                 event: event,
                 canCheckIn: true, 
