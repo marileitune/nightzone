@@ -53,7 +53,7 @@ router.patch('/account/:userId', async (req, res) => {
     try {
         let userId = req.params.userId
         const {firstName, lastName, email, imageAccount, password, confirmPassword} = req.body
-        console.log('req.email', email)
+     
         if (!firstName || !lastName || !email || !password || !confirmPassword) {
             return res.status(500).json({
                 errorMessage: 'Please fill in all fields'
@@ -92,7 +92,7 @@ router.patch('/account/:userId', async (req, res) => {
             }
 
         }
-
+       
         //encryption: create a salt and a hash
         let salt = bcrypt.genSaltSync(10);
         let hash = bcrypt.hashSync(password, salt);
@@ -100,8 +100,8 @@ router.patch('/account/:userId', async (req, res) => {
         if (!imageAccount) {
             imageAccount = req.session.loggedInUser.imageAccount
         }
-       
-        const user = await User.findByIdAndUpdate({_id: userId}, {firstName, lastName, email, imageAccount, password: password}, {new: true})
+   
+        const user = await User.findByIdAndUpdate({_id: userId}, {firstName, lastName, email, imageAccount, password: hash}, {new: true})
         user.password = "***";
           req.session.loggedInUser = user;
           return res.status(200).json(user); 

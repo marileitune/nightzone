@@ -83,6 +83,7 @@ router.post('/signup', async (req, res) => {
     //encryption: create a salt and a hash
     let salt = bcrypt.genSaltSync(10);
     let hash = bcrypt.hashSync(password, salt);
+    console.log('hash signup',hash)
     const user = await User.create({firstName, lastName, email, password: hash})
     user.password = "***";
     req.session.loggedInUser = user;
@@ -124,6 +125,7 @@ router.post('/signin', async (req, res) => {
       }
       //if both passwords don't match
       else {
+        
         return res.status(200).json({
           errorMessage: "Your password is wrong"
         })

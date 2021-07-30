@@ -69,10 +69,10 @@ router.get('/events/hotzone', async (req, res) => {
         .populate('checkIn')//this is to get the user's photo and name
         
         let eventsFiltered = events.filter((event) => {
-            let today = new Date().getTime(); 
+            let today = new Date().getTime() ; 
             let eventStartDate = Date.parse(event.start); 
             let eventEndDate = Date.parse(event.end);//comparing all the dates in milliseconds 
-            return (today >= eventStartDate && today <= eventEndDate) 
+            return (today >= eventStartDate - 10800000 && today <= eventEndDate) 
         }) 
         
         let eventsSorted = eventsFiltered.sort((a, b) => {
